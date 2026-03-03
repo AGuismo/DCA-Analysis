@@ -449,7 +449,7 @@ def main():
     if EXISTING_MAP:
         map_str = json.dumps(EXISTING_MAP, indent=2)
         label = "DCA_TARGET_MAP (updated)" if map_was_updated else "DCA_TARGET_MAP"
-        send_to_discord(f"**📋 {label}:**\n```json\n{map_str}\n```", color=0x95a5a6)
+        send_to_discord(f"**📋 {label}:**\n{map_str}")
 
     # Export the merged map for GitHub Actions
     if EXISTING_MAP:
