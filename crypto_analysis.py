@@ -255,7 +255,13 @@ def get_ai_summary(full_report, current_symbol):
     except Exception as e:
         return f"AI Analysis failed: {e}", None, None
 
-def send_to_discord(report_content):
+def send_to_discord(report_content, color=3447003):
+    """Send a report to Discord via webhook.
+
+    Args:
+        report_content: Text to send.
+        color: Embed sidebar color (default: blue 3447003).
+    """
     if not DISCORD_WEBHOOK_URL:
         print("No DISCORD_WEBHOOK_URL found. Skipping Discord notification.")
         return
@@ -268,7 +274,7 @@ def send_to_discord(report_content):
         payload = {
             "embeds": [{
                 "description": chunk,
-                "color": 3447003  # Blue color (same as portfolio balance)
+                "color": color
             }]
         }
         try:
@@ -280,6 +286,8 @@ def send_to_discord(report_content):
 
 def main():
     exchange = getattr(ccxt, EXCHANGE_ID)({"enableRateLimit": True})
+
+    map_was_updated = False  # Track whether any TIME value was actually changed
 
     for symbol in SYMBOLS:
         print(f"\nExample: PROCESSING {symbol}...")
@@ -403,11 +411,17 @@ def main():
 
                 # Update Logic
                 if target_key in EXISTING_MAP and isinstance(EXISTING_MAP[target_key], dict):
+                    old_time = EXISTING_MAP[target_key].get("TIME")
                     EXISTING_MAP[target_key]["TIME"] = final_time
+                    if final_time != old_time:
+                        map_was_updated = True
                     log(f"✅ Updated existing config for '{target_key}' -> TIME: {final_time}")
                 elif target_key in EXISTING_MAP:
                     # It's a string (legacy format)
+                    old_time = EXISTING_MAP[target_key]
                     EXISTING_MAP[target_key] = final_time
+                    if final_time != old_time:
+                        map_was_updated = True
                     log(f"✅ Updated legacy string for '{target_key}' -> {final_time}")
                 else:
                     # Symbol not in DCA_TARGET_MAP (new manual-dispatch analysis).
@@ -434,7 +448,8 @@ def main():
     # Send final DCA_TARGET_MAP snapshot (reflects all TIME updates from this run)
     if EXISTING_MAP:
         map_str = json.dumps(EXISTING_MAP, indent=2)
-        send_to_discord(f"**📋 DCA_TARGET_MAP (updated):**\n```json\n{map_str}\n```")
+        label = "DCA_TARGET_MAP (updated)" if map_was_updated else "DCA_TARGET_MAP"
+        send_to_discord(f"**📋 {label}:**\n```json\n{map_str}\n```", color=0x95a5a6)
 
     # Export the merged map for GitHub Actions
     if EXISTING_MAP:
