@@ -447,9 +447,21 @@ def main():
 
     # Send final DCA_TARGET_MAP snapshot (reflects all TIME updates from this run)
     if EXISTING_MAP:
-        map_str = json.dumps(EXISTING_MAP, indent=2)
         label = "DCA_TARGET_MAP (updated)" if map_was_updated else "DCA_TARGET_MAP"
-        send_to_discord(f"**📋 {label}:**\n{map_str}")
+        lines = [f"**📋 {label}**\n"]
+        for symbol, config in EXISTING_MAP.items():
+            if isinstance(config, dict):
+                enabled = config.get("BUY_ENABLED", True)
+                status = "🟢" if enabled else "🔴"
+                lines.append(
+                    f"{status} **{symbol}** — "
+                    f"Time: `{config.get('TIME', '?')}`, "
+                    f"Amount: `{config.get('AMOUNT', '?')}` THB, "
+                    f"Last Buy: `{config.get('LAST_BUY_DATE', 'never')}`"
+                )
+            else:
+                lines.append(f"🟢 **{symbol}** — `{config}`")
+        send_to_discord("\n".join(lines))
 
     # Export the merged map for GitHub Actions
     if EXISTING_MAP:
