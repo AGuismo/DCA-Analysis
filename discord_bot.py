@@ -425,7 +425,7 @@ async def handle_update_dca(params: dict, message: discord.Message):
     if update_repo_variable("DCA_TARGET_MAP", new_json):
         # Build recap of full updated config
         lines = [f"✅ Updated **{symbol}** → **{field}**: `{old_value}` → `{value}`\n"]
-        lines.append("**📋 Current DCA Configuration**\n")
+        lines.append("**📋 DCA Configuration**\n")
         for sym, config in target_map.items():
             if isinstance(config, dict):
                 enabled = config.get("BUY_ENABLED", True)
