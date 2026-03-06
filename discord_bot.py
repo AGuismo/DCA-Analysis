@@ -423,9 +423,22 @@ async def handle_update_dca(params: dict, message: discord.Message):
     # Save back to GitHub
     new_json = json.dumps(target_map, separators=(",", ":"))
     if update_repo_variable("DCA_TARGET_MAP", new_json):
-        await message.reply(
-            f"✅ Updated **{symbol}** → **{field}**: `{old_value}` → `{value}`"
-        )
+        # Build recap of full updated config
+        lines = [f"✅ Updated **{symbol}** → **{field}**: `{old_value}` → `{value}`\n"]
+        lines.append("**📋 Current DCA Configuration**\n")
+        for sym, config in target_map.items():
+            if isinstance(config, dict):
+                enabled = config.get("BUY_ENABLED", True)
+                status = "🟢" if enabled else "🔴"
+                lines.append(
+                    f"{status} **{sym}** — "
+                    f"Time: `{config.get('TIME', '?')}`, "
+                    f"Amount: `{config.get('AMOUNT', '?')}` THB, "
+                    f"Last Buy: `{config.get('LAST_BUY_DATE', 'never')}`"
+                )
+            else:
+                lines.append(f"🟢 **{sym}** — `{config}`")
+        await message.reply("\n".join(lines))
     else:
         await message.reply("❌ Failed to save DCA_TARGET_MAP to GitHub")
 
