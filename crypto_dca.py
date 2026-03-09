@@ -310,7 +310,7 @@ def execute_trade(symbol, amount_thb, map_key=None, target_map=None):
         usd_spent = spent_thb * fx_rate if fx_rate > 0 else 0
         usd_price_per_unit = (usd_spent / received_amt) if received_amt > 0 else 0
         _gha_mask(f"{usd_spent:.2f}")
-        _gha_mask(f"{usd_price_per_unit:.2f}")
+        _gha_mask(f"{usd_price_per_unit:.4f}")
 
         # 5. Log to Ghostfolio
         ghostfolio_saved = False
@@ -363,7 +363,7 @@ def execute_trade(symbol, amount_thb, map_key=None, target_map=None):
             f"💵 **Spent (USD):** ${usd_spent:,.2f}\n"
             f"📥 **Received:** {received_amt:.8f} {base_sym}\n"
             f"🏷️ **Rate:** ฿{rate:,.2f}\n"
-            f"🏷️ **Rate (USD):** ${usd_price_per_unit:,.2f}\n"
+            f"🏷️ **Rate (USD):** ${usd_price_per_unit:,.4f}\n"
             f"💾 **Portfolio:** {'✅ Saved' if ghostfolio_saved else '❌ Not saved'}\n"
             f"🕒 **Time:** {dt_str}\n"
             f"🆔 **Order ID:** {order_id}"

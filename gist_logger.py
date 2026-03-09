@@ -53,7 +53,7 @@ def update_gist_log(trade_data, symbol="BTC", saved_to_ghostfolio=False):
             usd_value = trade_data.get('amount_btc', 0) * trade_data.get('usd_rate', 0)
 
         # Check if header exists, if not add it
-        header_line = "| Date                 | THB Spent | USD Spent | Price (THB)    | Price (USD)    | Crypto             | Saved |\n"
+        header_line = "| Date                 | THB Spent | USD Spent | Price (THB)    | Price (USD)      | Crypto             | Saved |\n"
         
         if "Date" not in current_content:
             current_content = header_line + current_content
@@ -68,13 +68,13 @@ def update_gist_log(trade_data, symbol="BTC", saved_to_ghostfolio=False):
         thb_spent_formatted = f"฿{trade_data['amount_thb']:.2f}"
         usd_spent_formatted = f"${usd_value:.2f}"
         thb_price_formatted = f"฿{trade_data['price']:,.2f}"
-        usd_price_formatted = f"${usd_price:,.2f}"
+        usd_price_formatted = f"${usd_price:,.4f}"
         
         # Determine saved status
         saved_status = "true" if saved_to_ghostfolio else "false"
         
         # Format row with fixed column widths
-        row = f"| {datetime_str:20} | {thb_spent_formatted:>10} | {usd_spent_formatted:>10} | {thb_price_formatted:>16} | {usd_price_formatted:>15} | {crypto_val:18} | {saved_status:5} |"
+        row = f"| {datetime_str:20} | {thb_spent_formatted:>10} | {usd_spent_formatted:>10} | {thb_price_formatted:>16} | {usd_price_formatted:>17} | {crypto_val:18} | {saved_status:5} |"
         
         # Ensure newline
         if not current_content.endswith('\n'):

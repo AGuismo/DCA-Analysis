@@ -258,11 +258,11 @@ Includes all of the above PLUS:
 📈 TRADE HISTORY (Feb 05 → Mar 05, 2026)
 
 BTC (19 trades) — Crypto amount: 0.00446910 — Spent: ฿6,949.95 ($223.75)
-• 2026-03-04 23:00 +07 - 0.00042594 BTC - Order ID: 69a04e8a93 - Price: ฿2,112,938.03 ($68,036.60) - Spent: ฿899.99 ($28.98)
+• 2026-03-04 23:00 +07 - 0.00042594 BTC - Order ID: 69a04e8a93 - Price: ฿2,112,938.03 ($68,036.6000) - Spent: ฿899.99 ($28.98)
 ...
 
 LINK (10 trades) — Crypto amount: 14.66775216 — Spent: ฿2,400.00 ($77.24)
-• 2026-03-04 23:45 +07 - 1.04260791 LINK - Order ID: 69a04e9aa0 - Price: ฿287.74 ($9.27) - Spent: ฿300.00 ($9.66)
+• 2026-03-04 23:45 +07 - 1.04260791 LINK - Order ID: 69a04e9aa0 - Price: ฿287.74 ($9.2668) - Spent: ฿300.00 ($9.66)
 ...
 ```
 
@@ -282,7 +282,7 @@ The system fetches real-time THB→USD exchange rates from multiple sources:
 
 Trades are automatically logged to Ghostfolio for portfolio tracking:
 - **Account Mapping**: Maps crypto symbols to Ghostfolio accounts via `PORTFOLIO_ACCOUNT_MAP` (falls back to DEFAULT)
-- **Precision**: 8-decimal quantity formatting (e.g., 0.00012345 BTC)
+- **Precision**: 8-decimal quantity formatting (e.g., 0.00012345 BTC), 4-decimal USD unit price (e.g., $0.8895 SUI)
 - **Comment Format**: `฿800.00 - $25.10 - tx_abc123de` (shows THB, USD, and exchange order ID)
 - **Data Source**: Yahoo Finance (BTCUSD, LINKUSD, etc.) - free tier compatible
 - **Timezone Support**: Uses configured TIMEZONE, converts to UTC for Ghostfolio

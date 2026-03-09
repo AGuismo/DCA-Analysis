@@ -166,7 +166,7 @@ def log_to_ghostfolio(trade_data, symbol, account_id):
             "quantity": quantity,
             "symbol": gf_symbol,
             "type": "BUY",
-            "unitPrice": round(trade_data['usd_price_per_unit'], 2)
+            "unitPrice": round(trade_data['usd_price_per_unit'], 4)
         }
         
         # 6. Import to Ghostfolio (with retry for transient errors)
@@ -182,7 +182,7 @@ def log_to_ghostfolio(trade_data, symbol, account_id):
                 r = requests.post(url, headers=headers, json=payload, timeout=30)
                 
                 if r.status_code == 201:
-                    print(f"✅ Successfully logged to Ghostfolio: {quantity:.8f} {symbol} @ ${activity['unitPrice']:.2f}")
+                    print(f"✅ Successfully logged to Ghostfolio: {quantity:.8f} {symbol} @ ${activity['unitPrice']:.4f}")
                     return True
                 else:
                     print(f"❌ Ghostfolio import failed ({r.status_code}): {r.text}")
