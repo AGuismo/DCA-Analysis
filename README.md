@@ -350,7 +350,7 @@ python discord_bot.py
 When `DCA_CRON_ENABLED=true`, the bot replaces the need for an external cron service (e.g., cron-job.org) by dispatching `daily_dca.yml` at the right times:
 - Reads target buy times from `DCA_TARGET_MAP` and triggers the workflow within a **±30 min window** (clock-aligned ticks at :00, :15, :30, :45), giving ~5 attempts per target to handle GitHub Actions flakiness
 - Status and update commands show planned dispatch times so you can verify the schedule at a glance
-- Schedule refreshes **hourly**, on **startup**, and **opportunistically** whenever any Discord command reads/updates `DCA_TARGET_MAP`
+- Schedule refreshes **every 30 minutes**, on **startup**, and **opportunistically** whenever any Discord command reads/updates `DCA_TARGET_MAP`. A Discord notification is sent if the schedule changes or if the GitHub API call fails during refresh
 - The `daily_dca.yml` bash quick-check still handles all safety logic (time matching, double-buy prevention), so early triggers exit cheaply
 
 ### Hosting

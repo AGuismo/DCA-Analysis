@@ -731,12 +731,6 @@ _QUARTER_HOURS = [
     for h in range(24) for m in (0, 15, 30, 45)
 ]
 
-# Hourly refresh at :05 past every hour (offset to avoid collision with quarter-hour ticks)
-_HOURLY_REFRESH = [
-    datetime.strptime(f"{h:02d}:05", "%H:%M").time().replace(tzinfo=TIMEZONE)
-    for h in range(24)
-]
-
 
 @tasks.loop(time=_QUARTER_HOURS)
 async def dca_scheduler_tick():
@@ -773,14 +767,48 @@ async def _before_scheduler_tick():
     await client.wait_until_ready()
 
 
-@tasks.loop(time=_HOURLY_REFRESH)
+async def _notify(content: str) -> None:
+    """Send a plain message to DISCORD_CHANNEL_ID if configured."""
+    if not CHANNEL_ID:
+        return
+    try:
+        ch = client.get_channel(int(CHANNEL_ID)) or await client.fetch_channel(int(CHANNEL_ID))
+        await ch.send(content)
+    except Exception as e:
+        print(f"⚠️ _notify failed: {e}")
+
+
+@tasks.loop(minutes=30)
 async def dca_schedule_refresh():
     """Periodically refresh the DCA schedule from GitHub."""
-    raw = await asyncio.to_thread(get_repo_variable, "DCA_TARGET_MAP")
-    refresh_dca_schedule(raw)
-    if _dca_schedule:
-        times = ", ".join(sorted(_dca_schedule.keys()))
-        print(f"🔄 DCA schedule refreshed: {times}")
+    try:
+        raw = await asyncio.to_thread(get_repo_variable, "DCA_TARGET_MAP")
+        if not raw:
+            msg = "⚠️ DCA schedule refresh failed: GitHub returned no data for DCA_TARGET_MAP — schedule unchanged"
+            print(msg)
+            await _notify(msg)
+            return
+        old_times = set(_dca_schedule.keys())
+        refresh_dca_schedule(raw)
+        new_times = set(_dca_schedule.keys())
+        if new_times != old_times:
+            added = new_times - old_times
+            removed = old_times - new_times
+            lines = ["⏰ **DCA schedule updated**"]
+            if removed:
+                lines.append(f"  Removed: `{', '.join(sorted(removed))}`")
+            if added:
+                lines.append(f"  Added:   `{', '.join(sorted(added))}`")
+            msg = "\n".join(lines)
+            print(f"🔄 DCA schedule updated: {sorted(old_times)} → {sorted(new_times)}")
+            await _notify(msg)
+        else:
+            times = ", ".join(sorted(_dca_schedule.keys()))
+            print(f"🔄 DCA schedule refreshed (no change): {times}")
+    except Exception as e:
+        msg = f"❌ DCA schedule refresh error: {e}"
+        print(msg)
+        await _notify(msg)
 
 
 @dca_schedule_refresh.before_loop
