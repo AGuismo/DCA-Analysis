@@ -28,7 +28,7 @@ flowchart LR
         T1["🕓 Daily 04:00 BKK\ncron"]
         T2["📅 Monthly 5th 07:00 BKK\ncron"]
         T3["📤 Push to main"]
-        T4["⏰ Built-in scheduler\n±30 min window"]
+        T4["⏰ Built-in scheduler\n-30/+60 min window"]
         T5["👤 Manual / Discord Bot"]
         T6["🕙 Daily 22:00 UTC\nsafety net cron"]
         T7["🚀 Discord Buy Now\nimmediate dispatch"]
@@ -185,7 +185,7 @@ flowchart TD
     N --> O["Update LAST_BUY_DATE\nin DCA_TARGET_MAP\n3 retries — fails loudly"]
 ```
 
-1. **Trigger** via built-in DCA scheduler (±30 min window), daily 22:00 UTC safety net cron, Discord "Buy Now" command, or manual GitHub Actions UI dispatch
+1. **Trigger** via built-in DCA scheduler (-30/+60 min window), daily 22:00 UTC safety net cron, Discord "Buy Now" command, or manual GitHub Actions UI dispatch
 2. **Bash Quick Check** (no checkout/Python required): Filters by `BUY_ENABLED`, `LAST_BUY_DATE`, time window
 3. If no match → Workflow ends (fast exit, no resources used)
 4. If match found → Checkout repo → Setup Python → Install deps → Run Python
@@ -348,7 +348,7 @@ python discord_bot.py
 
 ### Built-in DCA Scheduler
 When `DCA_CRON_ENABLED=true`, the bot replaces the need for an external cron service (e.g., cron-job.org) by dispatching `daily_dca.yml` at the right times:
-- Reads target buy times from `DCA_TARGET_MAP` and triggers the workflow within a **±30 min window** (clock-aligned ticks at :00, :15, :30, :45), giving ~5 attempts per target to handle GitHub Actions flakiness
+- Reads target buy times from `DCA_TARGET_MAP` and triggers the workflow within a **-30/+60 min window** (clock-aligned ticks at :00, :15, :30, :45), giving ~7 attempts per target to handle GitHub Actions flakiness
 - Status and update commands show planned dispatch times so you can verify the schedule at a glance
 - Schedule refreshes **every 30 minutes**, on **startup**, and **opportunistically** whenever any Discord command reads/updates `DCA_TARGET_MAP`. A Discord notification is sent if the schedule changes or if the GitHub API call fails during refresh
 - The `daily_dca.yml` bash quick-check still handles all safety logic (time matching, double-buy prevention), so early triggers exit cheaply

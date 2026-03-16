@@ -296,12 +296,12 @@ def _format_cron_status() -> str:
         symbols_dict = info["symbols"]
         all_bought = all(lbd == today for lbd in symbols_dict.values())
 
-        # Compute all aligned dispatch times in the ±30 min window, sorted by offset from target
+        # Compute all aligned dispatch times in the -30/+60 min window, sorted by offset from target
         slots: list[tuple[int, int]] = []  # (diff, slot_min)
         for quarter in range(0, 24 * 4):
             slot_min = quarter * 15
             diff = _wrap_diff(slot_min, target_min)
-            if -15 <= diff <= 45:
+            if -30 <= diff <= 60:
                 slots.append((diff, slot_min))
         slots.sort()
 
@@ -621,7 +621,7 @@ async def handle_buy_now(params: dict, message: discord.Message):
         await message.reply(f"❌ Config for {symbol} is not in dict format")
         return
 
-    # Use current time so the scheduler window (-15 to +45 min) triggers immediately
+    # Use current time so the scheduler window (-30 to +60 min) triggers immediately
     new_time = datetime.now(TIMEZONE).strftime("%H:%M")
     old_time = target_map[symbol].get("TIME", "?")
     was_enabled = target_map[symbol].get("BUY_ENABLED", True)
@@ -734,7 +734,7 @@ _QUARTER_HOURS = [
 
 @tasks.loop(time=_QUARTER_HOURS)
 async def dca_scheduler_tick():
-    """Check if any DCA target is within its ±30 min trigger window and dispatch the workflow."""
+    """Check if any DCA target is within its -30/+60 min trigger window and dispatch the workflow."""
     if not _dca_schedule:
         return
 
@@ -745,12 +745,12 @@ async def dca_scheduler_tick():
     triggered_symbols: list[str] = []
 
     for time_str, info in _dca_schedule.items():
-        # Check if current clock quarter is within ±30 min of target
+        # Check if current clock quarter is within -30 to +60 min of target
         h, m = map(int, time_str.split(":"))
         target_min = h * 60 + m
         diff = _wrap_diff(current_min, target_min)
 
-        if -15 <= diff <= 45:
+        if -30 <= diff <= 60:
             should_dispatch = True
             triggered_symbols.extend(info["symbols"].keys())
 
@@ -852,7 +852,7 @@ async def on_ready():
             dca_scheduler_tick.start()
         if not dca_schedule_refresh.is_running():
             dca_schedule_refresh.start()
-        print(f"⏰ DCA scheduler started (±30 min window, 15 min ticks, TZ={TIMEZONE})")
+        print(f"⏰ DCA scheduler started (-30/+60 min window, 15 min ticks, TZ={TIMEZONE})")
 
 
 @client.event
