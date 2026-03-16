@@ -46,8 +46,8 @@ discord_bot.py      ← Discord bot + DCA scheduler (standalone, triggers GitHub
 
 | Workflow | Trigger | Python Script | Dependencies |
 |---|---|---|---|
-| `crypto_analysis.yml` | Daily 23:00 UTC + manual dispatch | `crypto_analysis.py` | `requirements.txt` (ccxt, pandas, google-generativeai, requests) |
-| `daily_dca.yml` | Daily 12:00 UTC + manual dispatch | `crypto_dca.py` | `requirements.txt` |
+| `crypto_analysis.yml` | Daily 21:00 UTC (04:00 BKK) + manual dispatch | `crypto_analysis.py` | `requirements.txt` (ccxt, pandas, google-generativeai, requests) |
+| `daily_dca.yml` | Daily 22:00 UTC (05:00 BKK) + manual dispatch | `crypto_dca.py` | `requirements.txt` |
 | `portfolio_check.yml` | Push to main + monthly 5th + manual | `portfolio_balance.py` | `requests` only (no requirements.txt) |
 
 The analysis workflow has a post-step that merges only `TIME` updates into the live `DCA_TARGET_MAP` (preserving `LAST_BUY_DATE` and other fields).

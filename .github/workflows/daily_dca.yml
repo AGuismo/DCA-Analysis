@@ -2,7 +2,7 @@ name: Daily Crypto DCA
 
 on:
   schedule:
-    - cron: '0 12 * * *'  # Daily at 12:00 UTC (19:00 Bangkok) — safety net if bot/cron is down
+    - cron: '0 22 * * *'  # Daily at 22:00 UTC (05:00 Bangkok) — safety net if bot/cron is down
   workflow_dispatch:
 
 # Prevent race conditions: Only one instance can run at a time
